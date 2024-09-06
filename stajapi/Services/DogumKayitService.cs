@@ -92,8 +92,9 @@ namespace stajapi.Services
 
                 _context.Kisi.Add(kisi);
                 _context.SaveChanges();
-                OlayKaydi(kisi.Tc, zaman, 1);
-                OlayKaydi(dto.AnneTc, dto.BabaTc, zaman, 1);
+                OlayKayit kayit = new OlayKayit();
+                kayit.OlayKaydi(kisi.Tc, zaman, 1);
+                kayit.OlayKaydi(dto.AnneTc, dto.BabaTc, zaman, 1);
             }
             catch (Exception ex)
             {

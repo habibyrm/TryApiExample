@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using stajapi.Dtos;
 using stajapi.Entities;
+using stajapi.Helpers;
 using stajapi.Services;
 
 namespace stajapi.Controllers
@@ -22,13 +25,26 @@ namespace stajapi.Controllers
         /// </summary>
         /// <param name="dto">Doğum kaydı için gerekli bilgiler.</param>
         /// <returns>Kayıt durumu.</returns>
+        //[Authorize]
         [HttpPost]
         public IActionResult DogumKayitOlustur([FromBody] DogumKayitDto dto)
         {
             try
             {
-                _dogumKayitService.DogumKaydet(dto);
-                return Ok("Doğum kaydı başarıyla oluşturuldu.");
+                if (!string.IsNullOrEmpty(CurrentToken.Token))
+                {
+                    DateTime dateNow = DateTime.Now;
+                    DateTime dateExpire = CurrentToken.tokenExpireDate;
+                    if (dateExpire > dateNow)
+                    {
+                        _dogumKayitService.DogumKaydet(dto);
+                        return Ok("Doğum kaydı başarıyla oluşturuldu.");
+                    }
+                    else
+                        return BadRequest("Token süresi dolmuştur.");
+                }
+                else
+                    return BadRequest("Token bulunamadı");
             }
             catch (Exception ex)
             {
